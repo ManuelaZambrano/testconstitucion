@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 2 - Tema 4-2</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --bad: #b91c1c;
+      --border: #dbe3ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.95;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    .controls, .results {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .question {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .question h3 {
+      margin-top: 0;
+      font-size: 1.04rem;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    label.option {
+      display: block;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      background: #fafcff;
+    }
+
+    label.option:hover {
+      border-color: var(--accent);
+      background: #f0f6ff;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+
+    .feedback {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    .correct { color: var(--ok); }
+    .incorrect { color: var(--bad); }
+
+    .explanation {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 8px;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover { filter: brightness(1.05); }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary:hover { background: #d1d5db; }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .hidden { display: none; }
+
+    @media (max-width: 700px) {
+      .container { padding: 14px; }
+      .header h1 { font-size: 1.45rem; }
+      button { width: 100%; margin-right: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="header">
+      <h1>Test 2 · Tema 4-2</h1>
+      <p>Defensor del Pueblo y Defensor del Pueblo Andaluz</p>
+      <div class="badge">35 preguntas tipo test · 4 opciones · 1 correcta</div>
+    </section>
+
+    <section class="controls">
+      <p><strong>Instrucciones:</strong> marca una respuesta en cada pregunta y pulsa <em>Corregir cuestionario</em>. Después podrás ver tu nota, revisar errores y reiniciar el test.</p>
+      <button class="primary" onclick="corregirTest()">Corregir cuestionario</button>
+      <button class="secondary" onclick="reiniciarTest()">Reiniciar</button>
+    </section>
+
+    <form id="quizForm"></form>
+
+    <section id="results" class="results hidden">
+      <div id="score" class="score"></div>
+      <div id="summary"></div>
+    </section>
+  </div>
+
+  <script>
+    const preguntas = [
+      {
+        enunciado: "1. El Tribunal Constitucional se regula por la siguiente norma:",
+        opciones: ["Ley 2/97, 2 de octubre", "L.O 2/79, 3 de octubre", "L.O 3/79, 1 de agosto", "Ley 4/69, 3 de noviembre"],
+        correcta: 1,
+        explicacion: "La Ley Orgánica del Tribunal Constitucional es la L.O. 2/1979, de 3 de octubre."
+      },
+      {
+        enunciado: "2. Según establece el artículo 162.1.b, ¿quién está legitimado para interponer el recurso de amparo?",
+        opciones: ["El Presidente del Gobierno", "El Defensor del Pueblo", "Ministerio de Interior", "Todas son correctas"],
+        correcta: 1,
+        explicacion: "El artículo 162.1.b CE legitima, entre otros, al Defensor del Pueblo para interponer recurso de amparo."
+      },
+      {
+        enunciado: "3. La ley que regula el Defensor del Pueblo es:",
+        opciones: ["LO 3/1991, 4 abril", "LO 9/1983, 1 dic.", "LO 3/1981, 6 abril", "LO 9/1981, 5 diciembre"],
+        correcta: 2,
+        explicacion: "La institución se regula por la Ley Orgánica 3/1981, de 6 de abril, del Defensor del Pueblo."
+      },
+      {
+        enunciado: "4. Art. 1 LODP. El Defensor del Pueblo es:",
+        opciones: ["El comisionado del Parlamento", "El comisionado de las Cortes Generales", "El comisionado del Gobierno", "Ninguna es correcta"],
+        correcta: 1,
+        explicacion: "El artículo 1 LODP lo define como alto comisionado de las Cortes Generales."
+      },
+      {
+        enunciado: "5. Art. 1 LODP. El Defensor del Pueblo:",
+        opciones: ["Es designado para la defensa de los derechos comprendidos en el Título I de la Constitución", "Es designado para la defensa de los derechos comprendidos en el Título III de la Constitución", "Es designado para la defensa de los derechos comprendidos en el Título II de la Constitución", "Podrá controlar la actividad de la Administración"],
+        correcta: 0,
+        explicacion: "El artículo 1 LODP señala expresamente que se designa para la defensa de los derechos comprendidos en el Título I de la Constitución."
+      },
+      {
+        enunciado: "6. Art. 2 LODP. El mandato del Defensor del Pueblo es por:",
+        opciones: ["3 años reelegible", "5 años reelegible", "10 años no reelegible", "2 años no reelegible"],
+        correcta: 1,
+        explicacion: "El artículo 2 LODP fija un periodo de cinco años."
+      },
+      {
+        enunciado: "7. Art. 2 LODP. ¿Quién se encarga de relacionarse con el Defensor del Pueblo?",
+        opciones: ["El Congreso", "El Senado", "Las Cortes Generales", "La Comisión Mixta Congreso-Senado"],
+        correcta: 3,
+        explicacion: "La Comisión Mixta Congreso-Senado es la encargada de relacionarse con el Defensor del Pueblo."
+      },
+      {
+        enunciado: "8. Art. 2 LODP. ¿Quién propone a los Plenos de las Cámaras el candidato a Defensor del Pueblo?",
+        opciones: ["El Presidente del Gobierno", "El Congreso", "El Pleno del Congreso", "La Comisión Mixta Congreso-Senado"],
+        correcta: 3,
+        explicacion: "La Comisión Mixta propone a los Plenos de las Cámaras el candidato o candidatos."
+      },
+      {
+        enunciado: "9. Art. 2 LODP. ¿Quórum requerido para la designación del Defensor del Pueblo en primera votación?",
+        opciones: ["2/3 del Congreso y posteriormente, en un plazo máximo de veinte días, 2/3 del Senado", "3/5 del Congreso y posteriormente, en un plazo máximo de veinte días, 3/5 del Senado", "3/4 del Congreso y posteriormente, en un plazo máximo de veinte días, 3/5 del Senado", "3/5 del Congreso y posteriormente, en un plazo máximo de veinte días, 2/3 del Senado"],
+        correcta: 1,
+        explicacion: "Se requiere 3/5 del Congreso y, posteriormente, 3/5 del Senado dentro de un plazo máximo de veinte días."
+      },
+      {
+        enunciado: "10. Art. 2 LODP. Los acuerdos de la Comisión Mixta Congreso-Senado se adoptarán:",
+        opciones: ["Por mayoría de 2/3", "Por mayoría simple", "Por mayoría absoluta", "Ninguna es correcta"],
+        correcta: 1,
+        explicacion: "El artículo 2 LODP establece mayoría simple para los acuerdos de la Comisión."
+      },
+      {
+        enunciado: "11. Art. 2 LODP. Si no se alcanza la mayoría requerida en primera votación para la designación del Defensor del Pueblo:",
+        opciones: ["Se celebrará nueva sesión de la Comisión Congreso-Senado en el plazo máximo de 1 mes y una vez conseguida la mayoría de los 3/5 en el Congreso, la designación quedará realizada al alcanzarse la mayoría simple del Senado.", "Se celebrará nueva sesión de la Comisión Congreso-Senado en el plazo máximo de 1 mes y una vez conseguida la mayoría de los 2/3 en el Congreso, la designación quedará realizada al alcanzarse la mayoría simple del Senado.", "Se celebrará nueva sesión de la Comisión Congreso-Senado en el plazo máximo de 2 meses y una vez conseguida la mayoría de los 2/3 en el Congreso, la designación quedará realizada al alcanzarse la mayoría absoluta del Senado.", "Se celebrará nueva sesión de la Comisión Congreso-Senado en el plazo máximo de 1 mes y una vez conseguida la mayoría de los 3/5 en el Congreso, la designación quedará realizada al alcanzarse la mayoría absoluta del Senado."],
+        correcta: 3,
+        explicacion: "Si no se alcanza la mayoría inicial, hay nueva sesión en el plazo máximo de un mes y basta luego con mayoría absoluta del Senado, una vez obtenidos los 3/5 en el Congreso."
+      },
+      {
+        enunciado: "12. Art. 4 LODP. ¿Quién acredita con su firma el nombramiento del Defensor del Pueblo?",
+        opciones: ["El presidente del Congreso y el presidente del Senado conjuntamente", "El presidente del Gobierno", "El Rey", "Todas son correctas"],
+        correcta: 0,
+        explicacion: "El nombramiento lo acreditan conjuntamente con sus firmas los presidentes del Congreso y del Senado."
+      },
+      {
+        enunciado: "13. ¿Dónde se publica el nombramiento del Defensor del Pueblo conforme al artículo 4 de la L.O. 3/81, de 6 de abril?",
+        opciones: ["En el BOP", "En el DOUE", "En el BOE", "En el BOJA"],
+        correcta: 2,
+        explicacion: "El artículo 4 LODP dispone su publicación en el Boletín Oficial del Estado."
+      },
+      {
+        enunciado: "14. Art. 3 LODP. ¿Quién puede ser elegido Defensor del Pueblo?",
+        opciones: ["Cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos jurídicos y políticos", "Cualquier español que se encuentre en el pleno disfrute de sus derechos civiles, políticos y jurídicos", "Cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos civiles y políticos", "Cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos sociales, civiles y políticos"],
+        correcta: 2,
+        explicacion: "Puede ser elegido cualquier español mayor de edad en pleno disfrute de sus derechos civiles y políticos."
+      },
+      {
+        enunciado: "15. Art. 5 LODP. La vacante en el cargo de Defensor del Pueblo cuando el que estaba ocupándola cesa por actuar con notoria negligencia en el cumplimiento de las obligaciones y deberes del cargo será declarada:",
+        opciones: ["Por el Rey", "Por el Presidente del Congreso", "Por mayoría de las tres quintas partes de los componentes de cada Cámara", "Ninguna es correcta"],
+        correcta: 2,
+        explicacion: "En los supuestos distintos de muerte, renuncia y expiración del mandato, se decide por mayoría de 3/5 de cada Cámara."
+      },
+      {
+        enunciado: "16. ¿Con qué otro nombre se le conocía antiguamente al Defensor del Pueblo?",
+        opciones: ["Advocate right", "Ombudsman", "Corpus right", "Ninguna es correcta"],
+        correcta: 1,
+        explicacion: "La figura es conocida tradicionalmente como Ombudsman."
+      },
+      {
+        enunciado: "17. Art. 6 LODP. El Defensor del Pueblo: (SEÑALA LA INCORRECTA)",
+        opciones: ["No estará sujeto a mandato imperativo alguno", "Gozará de inviolabilidad por las opiniones o actos que realice en el ejercicio de las competencias de su cargo", "Mientras permanezca en el ejercicio de sus funciones, el Defensor del Pueblo no podrá ser detenido ni retenido", "Desempeñará sus funciones con autonomía y según su criterio"],
+        correcta: 2,
+        explicacion: "Es la incorrecta porque sí puede ser detenido en caso de flagrante delito."
+      },
+      {
+        enunciado: "18. Art. 7 LODP. El Defensor del Pueblo es incompatible: (SEÑALA LA INCORRECTA)",
+        opciones: ["Con la permanencia en el servicio activo de cualquier Administración pública", "Con la afiliación a un sindicato", "Con el desempeño de funciones directivas en un partido político o en un sindicato", "Con cualquier actividad profesional, liberal, mercantil o laboral"],
+        correcta: 1,
+        explicacion: "La ley menciona la afiliación a un partido político, pero no la simple afiliación a un sindicato; sí prohíbe funciones directivas en sindicato."
+      },
+      {
+        enunciado: "19. Art. 7 LODP. El Defensor del Pueblo deberá cesar de toda situación de incompatibilidad que pudiera afectarle:",
+        opciones: ["Dentro del mes siguiente a su nombramiento y antes de tomar posesión", "Dentro de los dos meses siguientes a su nombramiento y antes de tomar posesión", "Dentro de los diez días siguientes a su nombramiento y antes de tomar posesión", "Dentro de los quince días siguientes a su nombramiento y antes de tomar posesión"],
+        correcta: 2,
+        explicacion: "Debe cesar dentro de los diez días siguientes a su nombramiento y antes de tomar posesión."
+      },
+      {
+        enunciado: "20. Art. 8 LODP. El Defensor del Pueblo estará auxiliado por:",
+        opciones: ["Tres adjuntos", "Un adjunto", "Dos adjuntos", "Cuatro adjuntos"],
+        correcta: 2,
+        explicacion: "La ley estatal prevé un Adjunto Primero y un Adjunto Segundo."
+      },
+      {
+        enunciado: "21. Art. 8 LODP. ¿Quién nombra a los Adjuntos del Defensor del Pueblo y dónde se publica?",
+        opciones: ["El Congreso y se publica en el BOE", "El Senado y no se publica", "El Congreso y el Senado conjuntamente y no se publica, se incorpora en el acta de la sesión", "El Defensor del Pueblo y se publica en el BOE"],
+        correcta: 3,
+        explicacion: "Los nombra el Defensor del Pueblo, con la conformidad previa correspondiente, y el nombramiento se publica en el BOE."
+      },
+      {
+        enunciado: "22. Art. 8 LODP. Los adjuntos del Defensor del Pueblo:",
+        opciones: ["No estarán sujetos a mandato imperativo alguno", "Gozarán de inviolabilidad", "Puede ser elegido cualquier español mayor de edad que se encuentre en el pleno disfrute de sus derechos civiles y políticos", "Todas son correctas"],
+        correcta: 3,
+        explicacion: "A los adjuntos les es aplicable lo dispuesto para el Defensor del Pueblo en los artículos 3, 6 y 7 LODP."
+      },
+      {
+        enunciado: "23. Art. 11 LODP. ¿Qué interrumpe la actividad del Defensor del Pueblo?",
+        opciones: ["La disolución de las Cortes Generales", "La declaración del Estado de Excepción", "La declaración del Estado de Sitio", "Ninguna es correcta"],
+        correcta: 3,
+        explicacion: "La actividad del Defensor del Pueblo no se interrumpe por la disolución ni porque las Cortes no estén reunidas."
+      },
+      {
+        enunciado: "24. Art. 14 LODP. El Defensor del Pueblo velará por el respeto de los derechos proclamados en el título primero de la Constitución en el ámbito de la Administración Militar:",
+        opciones: ["Pudiendo interferir en el mando de la Defensa Nacional", "No pudiendo interferir en el mando de la Defensa Nacional", "No pudiendo interferir en el mando de la Defensa Regional", "Ninguna es correcta"],
+        correcta: 1,
+        explicacion: "La ley dice expresamente que ello no podrá entrañar interferencia en el mando de la Defensa Nacional."
+      },
+      {
+        enunciado: "25. Art. 15 LODP. Las quejas al Defensor del Pueblo:",
+        opciones: ["Se presentarán firmadas por el interesado mediante papel común y en el plazo máximo de dos años, contado a partir del momento en que tuviera conocimiento de los hechos objeto de la misma", "Se presentarán firmadas por el interesado mediante papel sellado y en el plazo máximo de un año, contado a partir del momento en que hubieran ocurrido los hechos objeto de la misma", "Se presentarán firmadas por el interesado mediante papel común y en el plazo máximo de un año, contado a partir del momento en que tuviera conocimiento de los hechos objeto de la misma", "Ninguna es correcta"],
+        correcta: 2,
+        explicacion: "La queja debe presentarse firmada, en papel común y en el plazo máximo de un año desde que se conocieron los hechos."
+      },
+      {
+        enunciado: "26. Art. 17 LODP. El Defensor del Pueblo rechazará las siguientes quejas:",
+        opciones: ["Las que advierta mala fe, carencia de fundamento o inexistencia de pretensión", "Aquellas cuya tramitación irrogue perjuicio al legítimo derecho de tercera persona", "Las anónimas", "Todas son correctas"],
+        correcta: 3,
+        explicacion: "El artículo 17 LODP prevé el rechazo de las quejas anónimas y permite rechazar las de mala fe, carentes de fundamento, sin pretensión o perjudiciales para tercero."
+      },
+      {
+        enunciado: "27. Art. 17 LODP. ¿Son susceptibles de recurso las decisiones del Defensor del Pueblo?",
+        opciones: ["No", "Sí", "Sí, siempre", "Ninguna es correcta"],
+        correcta: 0,
+        explicacion: "Las decisiones del Defensor del Pueblo no son susceptibles de recurso."
+      },
+      {
+        enunciado: "28. Art. 22 LODP. El Defensor del Pueblo podrá solicitar a los poderes públicos los documentos clasificados con el carácter de secretos:",
+        opciones: ["No, en esa materia no se puede meter", "Sí, y no se le pueden negar en ningún caso", "Sí, pero el Consejo de Ministros puede acordar que no se le remitan", "Ninguna es correcta"],
+        correcta: 2,
+        explicacion: "Puede solicitarlos, pero la no remisión debe ser acordada por el Consejo de Ministros."
+      },
+      {
+        enunciado: "29. Art. 25 LODP. Cuando el Defensor del Pueblo, en razón del ejercicio de las funciones propias de su cargo, tenga conocimiento de una conducta o hechos presumiblemente delictivos:",
+        opciones: ["Lo pondrá de inmediato en conocimiento de los Jueces competentes", "Lo pondrá de inmediato en conocimiento del Fiscal General del Estado", "Lo pondrá de inmediato en conocimiento del Ministerio de Interior", "Lo pondrá de inmediato en conocimiento de las Cortes Generales"],
+        correcta: 1,
+        explicacion: "Debe ponerlo de inmediato en conocimiento del Fiscal General del Estado."
+      },
+      {
+        enunciado: "30. Art. 8 LDPA. El Defensor del Pueblo Andaluz estará auxiliado por:",
+        opciones: ["Tres adjuntos", "Un adjunto", "Dos adjuntos", "Cuatro adjuntos"],
+        correcta: 0,
+        explicacion: "La ley andaluza prevé tres personas adjuntas."
+      },
+      {
+        enunciado: "31. Art. 29 LODP. El Defensor del Pueblo está legitimado para interponer:",
+        opciones: ["Recurso de amparo", "Recurso de inconstitucionalidad", "Recurso de constitucionalidad", "a y b son correctas"],
+        correcta: 3,
+        explicacion: "Está legitimado para interponer recursos de inconstitucionalidad y de amparo."
+      },
+      {
+        enunciado: "32. Art. 32 LODP. El Defensor del Pueblo dará cuenta a las Cortes Generales de la gestión realizada en un informe que presentará ante las mismas cuando se hallen reunidas en período ordinario de sesiones:",
+        opciones: ["Semestralmente", "Anualmente", "Trimestralmente", "Bienalmente"],
+        correcta: 1,
+        explicacion: "El informe general a las Cortes Generales es anual."
+      },
+      {
+        enunciado: "33. El Defensor del Pueblo Andaluz es:",
+        opciones: ["Alto comisionado de las Cortes Generales", "Comisionado de las Cortes Generales", "Comisionado del Parlamento", "Alto comisionado del Parlamento"],
+        correcta: 2,
+        explicacion: "La ley andaluza lo configura como comisionado del Parlamento."
+      },
+      {
+        enunciado: "34. El Defensor del Pueblo Andaluz puede interponer los siguientes recursos:",
+        opciones: ["Recurso de amparo", "Recurso de inconstitucionalidad", "Recurso de constitucionalidad", "Ninguna es correcta"],
+        correcta: 3,
+        explicacion: "El Defensor del Pueblo Andaluz no los interpone directamente; puede instar al Defensor del Pueblo del Estado la interposición del recurso de inconstitucionalidad."
+      },
+      {
+        enunciado: "35. ¿Quién ejercerá las funciones del Mecanismo Nacional de Prevención de la Tortura?",
+        opciones: ["Defensor del Pueblo Andaluz", "Defensor del Pueblo", "a y b son correctas", "Ninguna es correcta"],
+        correcta: 1,
+        explicacion: "Las funciones del Mecanismo Nacional de Prevención de la Tortura corresponden al Defensor del Pueblo estatal."
+      }
+    ];
+
+    const form = document.getElementById('quizForm');
+    const results = document.getElementById('results');
+    const score = document.getElementById('score');
+    const summary = document.getElementById('summary');
+
+    function renderPreguntas() {
+      form.innerHTML = '';
+
+      preguntas.forEach((pregunta, i) => {
+        const bloque = document.createElement('section');
+        bloque.className = 'question';
+        bloque.innerHTML = `
+          <h3>${pregunta.enunciado}</h3>
+          <div class="options">
+            ${pregunta.opciones.map((op, j) => `
+              <label class="option">
+                <input type="radio" name="pregunta_${i}" value="${j}">
+                ${String.fromCharCode(97 + j)}) ${op}
+              </label>
+            `).join('')}
+          </div>
+          <div id="feedback_${i}" class="feedback"></div>
+          <div id="explanation_${i}" class="explanation"></div>
+        `;
+        form.appendChild(bloque);
+      });
+    }
+
+    function corregirTest() {
+      let aciertos = 0;
+      let contestadas = 0;
+
+      preguntas.forEach((pregunta, i) => {
+        const seleccionada = document.querySelector(`input[name="pregunta_${i}"]:checked`);
+        const feedback = document.getElementById(`feedback_${i}`);
+        const explanation = document.getElementById(`explanation_${i}`);
+
+        if (seleccionada) {
+          contestadas++;
+          const valor = Number(seleccionada.value);
+          if (valor === pregunta.correcta) {
+            aciertos++;
+            feedback.textContent = '✅ Correcta';
+            feedback.className = 'feedback correct';
+          } else {
+            feedback.textContent = `❌ Incorrecta. Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}`;
+            feedback.className = 'feedback incorrect';
+          }
+          explanation.textContent = pregunta.explicacion;
+        } else {
+          feedback.textContent = '⚠️ No contestada.';
+          feedback.className = 'feedback incorrect';
+          explanation.textContent = `Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}. ${pregunta.explicacion}`;
+        }
+      });
+
+      const total = preguntas.length;
+      const nota10 = ((aciertos / total) * 10).toFixed(2);
+      score.textContent = `Resultado: ${aciertos}/${total} aciertos · Nota: ${nota10}/10`;
+      summary.innerHTML = `
+        <p><strong>Preguntas contestadas:</strong> ${contestadas} de ${total}</p>
+        <p><strong>Errores o no contestadas:</strong> ${total - aciertos}</p>
+      `;
+      results.classList.remove('hidden');
+      results.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function reiniciarTest() {
+      form.reset();
+      preguntas.forEach((_, i) => {
+        document.getElementById(`feedback_${i}`).textContent = '';
+        document.getElementById(`feedback_${i}`).className = 'feedback';
+        document.getElementById(`explanation_${i}`).textContent = '';
+      });
+      results.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderPreguntas();
+  </script>
+</body>
+</html>
