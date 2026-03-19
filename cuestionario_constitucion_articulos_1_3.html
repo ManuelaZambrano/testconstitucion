@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuestionario Constitución Española: Artículos 1, 2 y 3</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --bad: #b91c1c;
+      --border: #dbe3ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 950px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+    }
+
+    .header p {
+      margin: 0;
+      opacity: 0.95;
+    }
+
+    .controls, .results {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .question {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+
+    .question h3 {
+      margin-top: 0;
+      font-size: 1.05rem;
+    }
+
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    label.option {
+      display: block;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      background: #fafcff;
+    }
+
+    label.option:hover {
+      border-color: var(--accent);
+      background: #f0f6ff;
+    }
+
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+
+    .feedback {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    .correct { color: var(--ok); }
+    .incorrect { color: var(--bad); }
+
+    .explanation {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 8px;
+      transition: 0.2s ease;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover { filter: brightness(1.05); }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .secondary:hover { background: #d1d5db; }
+
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    .hidden { display: none; }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 700px) {
+      .container { padding: 14px; }
+      .header h1 { font-size: 1.45rem; }
+      button { width: 100%; margin-right: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="header">
+      <h1>Cuestionario interactivo</h1>
+      <p>Constitución Española: artículos 1, 2 y 3</p>
+      <div class="badge">15 preguntas tipo test · 3 opciones · 1 correcta</div>
+    </section>
+
+    <section class="controls">
+      <p><strong>Instrucciones:</strong> marca una respuesta en cada pregunta y pulsa <em>Corregir cuestionario</em>. Después podrás ver tu nota, revisar errores y reiniciar el test.</p>
+      <button class="primary" onclick="corregirTest()">Corregir cuestionario</button>
+      <button class="secondary" onclick="reiniciarTest()">Reiniciar</button>
+    </section>
+
+    <form id="quizForm"></form>
+
+    <section id="results" class="results hidden">
+      <div id="score" class="score"></div>
+      <div id="summary"></div>
+    </section>
+  </div>
+
+  <script>
+    const preguntas = [
+      {
+        enunciado: "1. ¿Qué forma política tiene el Estado español según la Constitución?",
+        opciones: ["República parlamentaria", "Monarquía parlamentaria", "Monarquía absoluta"],
+        correcta: 1,
+        explicacion: "El artículo 1.3 establece que la forma política del Estado español es la Monarquía parlamentaria."
+      },
+      {
+        enunciado: "2. ¿En quién reside la soberanía nacional?",
+        opciones: ["En el Rey", "En el Gobierno", "En el pueblo español"],
+        correcta: 2,
+        explicacion: "El artículo 1.2 dice que la soberanía nacional reside en el pueblo español, del que emanan los poderes del Estado."
+      },
+      {
+        enunciado: "3. ¿Qué tipo de Estado se proclama en el artículo 1?",
+        opciones: ["Estado liberal", "Estado social y democrático de Derecho", "Estado autonómico"],
+        correcta: 1,
+        explicacion: "El artículo 1.1 define a España como un Estado social y democrático de Derecho."
+      },
+      {
+        enunciado: "4. ¿Cuál de los siguientes NO es un valor superior del ordenamiento jurídico?",
+        opciones: ["Libertad", "Igualdad", "Seguridad jurídica"],
+        correcta: 2,
+        explicacion: "Los valores del artículo 1.1 son libertad, justicia, igualdad y pluralismo político. Seguridad jurídica aparece en otro precepto constitucional."
+      },
+      {
+        enunciado: "5. ¿Qué valor sí aparece en el artículo 1.1?",
+        opciones: ["Pluralismo político", "Unidad territorial", "Justicia militar"],
+        correcta: 0,
+        explicacion: "El pluralismo político figura expresamente entre los valores superiores del ordenamiento jurídico."
+      },
+      {
+        enunciado: "6. ¿Qué proclama el artículo 2 de la Constitución?",
+        opciones: ["La división de poderes", "La indisoluble unidad de la Nación española", "La soberanía del Rey"],
+        correcta: 1,
+        explicacion: "El artículo 2 se fundamenta en la indisoluble unidad de la Nación española, patria común e indivisible de todos los españoles."
+      },
+      {
+        enunciado: "7. ¿Qué derecho se reconoce a las nacionalidades y regiones?",
+        opciones: ["Derecho de autodeterminación", "Derecho a la autonomía", "Derecho de secesión"],
+        correcta: 1,
+        explicacion: "El artículo 2 reconoce y garantiza el derecho a la autonomía de las nacionalidades y regiones que integran la Nación española."
+      },
+      {
+        enunciado: "8. ¿Qué principio garantiza el artículo 2 entre territorios?",
+        opciones: ["Solidaridad", "Igualdad absoluta", "Independencia"],
+        correcta: 0,
+        explicacion: "El final del artículo 2 añade que la Constitución garantiza la solidaridad entre todas ellas."
+      },
+      {
+        enunciado: "9. ¿Cómo define la Constitución a España en el artículo 2?",
+        opciones: ["Federación de Estados", "Nación indivisible", "Confederación"],
+        correcta: 1,
+        explicacion: "El artículo 2 habla de la unidad de la Nación española y de la patria común e indivisible."
+      },
+      {
+        enunciado: "10. ¿Qué NO aparece en el artículo 2?",
+        opciones: ["Unidad", "Autonomía", "Federalismo"],
+        correcta: 2,
+        explicacion: "El término federalismo no aparece en el artículo 2; sí aparecen unidad, autonomía y solidaridad."
+      },
+      {
+        enunciado: "11. ¿Cuál es la lengua oficial del Estado?",
+        opciones: ["El castellano", "El español y el latín", "El castellano y las lenguas cooficiales"],
+        correcta: 0,
+        explicacion: "El artículo 3.1 establece que el castellano es la lengua española oficial del Estado."
+      },
+      {
+        enunciado: "12. ¿Qué deber tienen los españoles respecto al castellano?",
+        opciones: ["Derecho a usarlo", "Deber de conocerlo", "Deber de enseñarlo"],
+        correcta: 1,
+        explicacion: "El artículo 3.1 recoge el deber de conocer el castellano."
+      },
+      {
+        enunciado: "13. ¿Qué derecho tienen los españoles respecto al castellano?",
+        opciones: ["Derecho a aprenderlo", "Derecho a usarlo", "Derecho a traducirlo"],
+        correcta: 1,
+        explicacion: "El mismo artículo 3.1 también reconoce el derecho a usar el castellano."
+      },
+      {
+        enunciado: "14. ¿Qué ocurre con las demás lenguas españolas?",
+        opciones: ["Están prohibidas", "Son cooficiales según los Estatutos de Autonomía", "Son opcionales en todo el territorio"],
+        correcta: 1,
+        explicacion: "El artículo 3.2 indica que las demás lenguas españolas serán también oficiales en las respectivas Comunidades Autónomas de acuerdo con sus Estatutos."
+      },
+      {
+        enunciado: "15. ¿Qué dice la Constitución sobre la riqueza lingüística?",
+        opciones: ["Debe ser limitada", "Es patrimonio cultural y será objeto de especial respeto y protección", "Solo se protege el castellano"],
+        correcta: 1,
+        explicacion: "El artículo 3.3 señala que la riqueza de las distintas modalidades lingüísticas de España es un patrimonio cultural que será objeto de especial respeto y protección."
+      }
+    ];
+
+    const form = document.getElementById('quizForm');
+    const results = document.getElementById('results');
+    const score = document.getElementById('score');
+    const summary = document.getElementById('summary');
+
+    function renderPreguntas() {
+      form.innerHTML = '';
+
+      preguntas.forEach((pregunta, i) => {
+        const bloque = document.createElement('section');
+        bloque.className = 'question';
+        bloque.innerHTML = `
+          <h3>${pregunta.enunciado}</h3>
+          <div class="options">
+            ${pregunta.opciones.map((op, j) => `
+              <label class="option">
+                <input type="radio" name="pregunta_${i}" value="${j}">
+                ${String.fromCharCode(97 + j)}) ${op}
+              </label>
+            `).join('')}
+          </div>
+          <div id="feedback_${i}" class="feedback"></div>
+          <div id="explanation_${i}" class="explanation"></div>
+        `;
+        form.appendChild(bloque);
+      });
+    }
+
+    function corregirTest() {
+      let aciertos = 0;
+      let contestadas = 0;
+
+      preguntas.forEach((pregunta, i) => {
+        const seleccionada = document.querySelector(`input[name="pregunta_${i}"]:checked`);
+        const feedback = document.getElementById(`feedback_${i}`);
+        const explanation = document.getElementById(`explanation_${i}`);
+
+        if (seleccionada) {
+          contestadas++;
+          const valor = Number(seleccionada.value);
+          if (valor === pregunta.correcta) {
+            aciertos++;
+            feedback.textContent = '✅ Correcta';
+            feedback.className = 'feedback correct';
+          } else {
+            feedback.textContent = `❌ Incorrecta. Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}`;
+            feedback.className = 'feedback incorrect';
+          }
+          explanation.textContent = pregunta.explicacion;
+        } else {
+          feedback.textContent = '⚠️ No contestada.';
+          feedback.className = 'feedback incorrect';
+          explanation.textContent = `Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}. ${pregunta.explicacion}`;
+        }
+      });
+
+      const total = preguntas.length;
+      const nota10 = ((aciertos / total) * 10).toFixed(2);
+      score.textContent = `Resultado: ${aciertos}/${total} aciertos · Nota: ${nota10}/10`;
+      summary.innerHTML = `
+        <p><strong>Preguntas contestadas:</strong> ${contestadas} de ${total}</p>
+        <p><strong>Errores o no contestadas:</strong> ${total - aciertos}</p>
+      `;
+      results.classList.remove('hidden');
+      results.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function reiniciarTest() {
+      form.reset();
+      preguntas.forEach((_, i) => {
+        document.getElementById(`feedback_${i}`).textContent = '';
+        document.getElementById(`feedback_${i}`).className = 'feedback';
+        document.getElementById(`explanation_${i}`).textContent = '';
+      });
+      results.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderPreguntas();
+  </script>
+</body>
+</html>
