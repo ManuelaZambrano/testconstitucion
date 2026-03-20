@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test 5 - Tema 5-3</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #2563eb;
+      --ok: #15803d;
+      --bad: #b91c1c;
+      --border: #dbe3ef;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .header {
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: white;
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.18);
+      margin-bottom: 24px;
+    }
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+    }
+    .header p {
+      margin: 0;
+      opacity: 0.95;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #dbeafe;
+      color: #1d4ed8;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .controls, .results {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+    .question {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    }
+    .question h3 {
+      margin-top: 0;
+      font-size: 1.04rem;
+    }
+    .options {
+      display: grid;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    label.option {
+      display: block;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.2s ease;
+      background: #fafcff;
+    }
+    label.option:hover {
+      border-color: var(--accent);
+      background: #f0f6ff;
+    }
+    input[type="radio"] {
+      margin-right: 10px;
+      transform: scale(1.1);
+    }
+    .feedback {
+      margin-top: 12px;
+      font-weight: bold;
+    }
+    .correct { color: var(--ok); }
+    .incorrect { color: var(--bad); }
+    .explanation {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-top: 8px;
+      transition: 0.2s ease;
+    }
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+    .primary:hover { filter: brightness(1.05); }
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+    .secondary:hover { background: #d1d5db; }
+    .score {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    .hidden { display: none; }
+    @media (max-width: 700px) {
+      .container { padding: 14px; }
+      .header h1 { font-size: 1.45rem; }
+      button { width: 100%; margin-right: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="header">
+      <h1>Test 5 · Tema 5-3</h1>
+      <p>Constitución Española, Ley 39/2015 y Ley 40/2015</p>
+      <div class="badge">29 preguntas tipo test · 4 opciones · 1 correcta</div>
+    </section>
+
+    <section class="controls">
+      <p><strong>Instrucciones:</strong> marca una respuesta en cada pregunta y pulsa <em>Corregir cuestionario</em>. Después podrás ver tu nota, revisar errores y reiniciar el test.</p>
+      <button class="primary" onclick="corregirTest()">Corregir cuestionario</button>
+      <button class="secondary" onclick="reiniciarTest()">Reiniciar</button>
+    </section>
+
+    <form id="quizForm"></form>
+
+    <section id="results" class="results hidden">
+      <div id="score" class="score"></div>
+      <div id="summary"></div>
+    </section>
+  </div>
+
+  <script>
+    const preguntas = [
+      {
+        enunciado: "1. Según lo establecido exactamente en la Ley 39/15, de 1 de octubre, del procedimiento administrativo común de las Administraciones públicas:",
+        opciones: [
+          "Los reglamentos y disposiciones administrativas desarrollarán en todo caso la ley.",
+          "Ninguna disposición administrativa podrá vulnerar los preceptos de otra de rango superior.",
+          "Las disposiciones administrativas se ajustarán al orden de jerarquía que establezcan los órganos de gobiernos que la dicten.",
+          "El ejercicio de la potestad reglamentaria es competencia exclusivamente de las entidades locales."
+        ],
+        correcta: 1,
+        explicacion: "El artículo 128.3 de la Ley 39/2015 establece que ninguna disposición administrativa podrá vulnerar los preceptos de otra de rango superior."
+      },
+      {
+        enunciado: "2. Art. 72 de la Ley 40/15, de 1 de octubre. La representación del Gobierno de la Nación en el territorio de la respectiva Comunidad Autónoma corresponde:",
+        opciones: [
+          "A sus presidentes.",
+          "A los Delegados del Gobierno.",
+          "A los secretarios de Estado.",
+          "A los delegados del gobierno y presidentes de las CCAA conjuntamente."
+        ],
+        correcta: 1,
+        explicacion: "La representación del Gobierno de la Nación en cada Comunidad Autónoma corresponde al Delegado del Gobierno."
+      },
+      {
+        enunciado: "3. Ley 40/15, de 1 de octubre. En el nombramiento de los Delegados del Gobierno en las CCAA se tendrá en cuenta criterios de:",
+        opciones: ["Antigüedad", "Igualdad", "Jerarquía", "Experiencia"],
+        correcta: 3,
+        explicacion: "La ley menciona criterios de competencia profesional y experiencia; entre las opciones dadas, la correcta es experiencia."
+      },
+      {
+        enunciado: "4. Ley 40/15, de 1 de octubre. Corresponde a los Delegados del Gobierno proteger el libre ejercicio de los derechos y libertades y garantizar la seguridad ciudadana:",
+        opciones: [
+          "A través de las Fuerzas y Cuerpos de Seguridad del Estado.",
+          "A través de los órganos del Gobierno de la respectiva CCAA.",
+          "A través del Ministerio de Interior.",
+          "A través de los órganos autonómicos y locales correspondientes."
+        ],
+        correcta: 0,
+        explicacion: "Los Delegados del Gobierno ejercen esta función a través de las Fuerzas y Cuerpos de Seguridad del Estado."
+      },
+      {
+        enunciado: "5. ¿Cuál no es un órgano directivo de la AGE?",
+        opciones: ["Directores Generales", "Delegados de Gobierno", "Subsecretarios", "Ministros"],
+        correcta: 3,
+        explicacion: "Los Ministros son órganos superiores, no órganos directivos."
+      },
+      {
+        enunciado: "6. Art. 128 de la Ley 39/15, de 1 de octubre, de procedimiento administrativo común de las Administraciones públicas. El ejercicio de la potestad reglamentaria corresponde:",
+        opciones: [
+          "Al Estado.",
+          "A los órganos de Gobierno de las Comunidades Autónomas, de conformidad con lo establecido en sus respectivos Estatutos.",
+          "A los órganos de gobierno locales, de acuerdo con lo previsto en la Constitución, los Estatutos de Autonomía y la Ley 7/1981, de 2 de abril, reguladora de las Bases del Régimen Local.",
+          "a y b son correctas."
+        ],
+        correcta: 3,
+        explicacion: "La potestad reglamentaria corresponde al Gobierno de la Nación, a los órganos de gobierno de las CCAA y a los órganos de gobierno locales. La opción c es incorrecta porque cita mal la ley de bases del régimen local."
+      },
+      {
+        enunciado: "7. Según establece la Ley 39/15, de 1 de octubre, en el ejercicio de la iniciativa legislativa y la potestad reglamentaria, las Administraciones Públicas actuarán de acuerdo con los siguientes principios:",
+        opciones: [
+          "Necesidad, eficacia, proporcionalidad, seguridad jurídica, irretroactividad y eficiencia.",
+          "Necesidad, eficacia, igualdad, seguridad jurídica, transparencia y eficiencia.",
+          "Necesidad, eficacia, proporcionalidad, seguridad pública, transparencia y eficiencia.",
+          "Necesidad, eficacia, proporcionalidad, seguridad jurídica, transparencia y eficiencia."
+        ],
+        correcta: 3,
+        explicacion: "Los principios de buena regulación del artículo 129 son necesidad, eficacia, proporcionalidad, seguridad jurídica, transparencia y eficiencia."
+      },
+      {
+        enunciado: "8. Art. 130 Ley 39/15, de 1 de octubre. Las Administraciones Públicas revisarán su normativa vigente para adaptarla a los principios de buena regulación de forma:",
+        opciones: ["Anual", "Periódica", "Semestral", "Mensual"],
+        correcta: 1,
+        explicacion: "El artículo 130 habla de revisión periódica de la normativa vigente."
+      },
+      {
+        enunciado: "9. Conforme establece el artículo 131 de la Ley 39/15, de 1 de octubre. La publicación del «Boletín Oficial del Estado» en la sede electrónica del Organismo competente tendrá el siguiente carácter:",
+        opciones: ["Privado y auténtico", "Público y ordinario", "Oficial y auténtico", "Oficial y extraordinario"],
+        correcta: 2,
+        explicacion: "La publicación en la sede electrónica del BOE tiene carácter oficial y auténtico."
+      },
+      {
+        enunciado: "10. Art. 132 Ley 39/15, de 1 de octubre. Las Administraciones Públicas harán público un Plan Normativo que contendrá las iniciativas legales o reglamentarias que vayan a ser elevadas para su aprobación en el año siguiente:",
+        opciones: [
+          "Semestralmente, y se publicará en el portal de transparencia.",
+          "Anualmente, y se publicará en el portal de accesibilidad.",
+          "Anualmente, y se publicará en el portal de transparencia.",
+          "Semestralmente, y se publicará en el portal de accesibilidad."
+        ],
+        correcta: 2,
+        explicacion: "El plan normativo es anual y debe publicarse en el portal de transparencia correspondiente."
+      },
+      {
+        enunciado: "11. Son considerados altos cargos conforme la Ley 40/15, de 1 de octubre:",
+        opciones: [
+          "Los ministros, los secretarios de estado, los subsecretarios y secretarios generales, los secretarios generales técnicos y directores generales, los subdirectores generales.",
+          "Los ministros, los secretarios de estado.",
+          "Los ministros, los secretarios de estado, los subsecretarios y secretarios generales.",
+          "Los ministros, los secretarios de estado, los subsecretarios y secretarios generales, los secretarios generales técnicos y directores generales."
+        ],
+        correcta: 3,
+        explicacion: "En la AGE se consideran altos cargos, entre otros, ministros, secretarios de Estado, subsecretarios, secretarios generales, secretarios generales técnicos y directores generales; no los subdirectores generales."
+      },
+      {
+        enunciado: "12. Art. 55 de la Ley 40/15, de 1 de octubre. Los Delegados del Gobierno en las Comunidades Autónomas y los Subdelegados del Gobierno en las provincias tendrán:",
+        opciones: [
+          "El primero tendrá rango de Subsecretario y el segundo nivel de Subdirector general.",
+          "El primero tendrá rango de Secretario y el segundo nivel de Subsecretario.",
+          "El primero tendrá rango de Subsecretario y el segundo nivel de Director general.",
+          "El primero tendrá rango de Secretario y el segundo nivel de Subdirector general."
+        ],
+        correcta: 0,
+        explicacion: "La ley atribuye al Delegado del Gobierno rango de Subsecretario y al Subdelegado nivel de Subdirector general."
+      },
+      {
+        enunciado: "13. En base al artículo 9 de nuestra Constitución, ¿quién está sujeto a la Constitución y al resto del ordenamiento jurídico?",
+        opciones: ["Los poderes públicos.", "Los españoles y los poderes públicos.", "Los españoles.", "Los ciudadanos y los poderes públicos."],
+        correcta: 3,
+        explicacion: "El artículo 9.1 CE dice que los ciudadanos y los poderes públicos están sujetos a la Constitución y al resto del ordenamiento jurídico."
+      },
+      {
+        enunciado: "14. En base al artículo 9 de nuestra Constitución, ¿a quién le corresponde promover las condiciones para que la libertad y la igualdad del individuo y de los grupos en que se integra sean reales y efectivas?",
+        opciones: ["A los poderes públicos.", "A los españoles y los poderes públicos.", "A los españoles.", "A los ciudadanos y los poderes públicos."],
+        correcta: 0,
+        explicacion: "El artículo 9.2 CE atribuye esa función a los poderes públicos."
+      },
+      {
+        enunciado: "15. Artículo 9 CE, marque la incorrecta. La Constitución garantiza el principio de:",
+        opciones: [
+          "Legalidad, la jerarquía nominativa, la publicidad de las normas.",
+          "La irretroactividad de las disposiciones sancionadoras no favorables o restrictivas de derechos individuales.",
+          "La seguridad jurídica, la responsabilidad.",
+          "La interdicción de la arbitrariedad de los poderes públicos."
+        ],
+        correcta: 0,
+        explicacion: "La expresión correcta es jerarquía normativa, no jerarquía nominativa."
+      },
+      {
+        enunciado: "16. ¿Cómo se denomina el Título I de nuestra Constitución?",
+        opciones: ["De los deberes y derechos fundamentales.", "De los derechos y deberes fundamentales.", "De los españoles y extranjeros.", "De los deberes y derechos."],
+        correcta: 1,
+        explicacion: "El Título I de la Constitución se denomina «De los derechos y deberes fundamentales»."
+      },
+      {
+        enunciado: "17. ¿En qué artículo de nuestra Constitución se recoge que la dignidad de la persona es fundamento de la paz social?",
+        opciones: ["Artículo 12.", "Artículo 11.", "Artículo 10.2.", "Artículo 10.1."],
+        correcta: 3,
+        explicacion: "La referencia está en el artículo 10.1 CE."
+      },
+      {
+        enunciado: "18. La dignidad de la persona, los derechos inviolables que le son inherentes, el libre desarrollo de la personalidad, el respeto a la ley y a los derechos de los demás son:",
+        opciones: [
+          "Fundamento del orden político.",
+          "Fundamento de la paz social.",
+          "Fundamento del orden público y de la paz social.",
+          "La opción a) y b) son correctas."
+        ],
+        correcta: 3,
+        explicacion: "El artículo 10.1 CE dice literalmente que son fundamento del orden político y de la paz social."
+      },
+      {
+        enunciado: "19. Artículo 10 Constitución Española. Las normas relativas a los derechos fundamentales y a las libertades que la Constitución reconoce se interpretarán de conformidad con:",
+        opciones: [
+          "La Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre las mismas materias ratificados por España.",
+          "La Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre todas las materias sancionados por España.",
+          "La Declaración Universal de Derechos Humanos y los tratados y acuerdos internacionales sobre las mismas materias sancionados por España.",
+          "La Declaración Universal de Derechos Humanos ratificada por España."
+        ],
+        correcta: 0,
+        explicacion: "El artículo 10.2 CE remite a la Declaración Universal y a los tratados y acuerdos internacionales sobre las mismas materias ratificados por España."
+      },
+      {
+        enunciado: "20. ¿En qué artículo de nuestra Constitución se recoge la nacionalidad?",
+        opciones: ["Artículo 12.", "Artículo 13.", "Artículo 11.", "Artículo 10."],
+        correcta: 2,
+        explicacion: "La nacionalidad española se regula en el artículo 11 CE."
+      },
+      {
+        enunciado: "21. Artículo 11 Constitución Española. La nacionalidad española:",
+        opciones: [
+          "Se adquiere, se conserva y se pierde de acuerdo con lo establecido por la ley orgánica.",
+          "Se adquiere y se pierde de acuerdo con lo establecido por los tratados.",
+          "Se adquiere, se conserva y se pierde de acuerdo con lo establecido por la ley.",
+          "Se adquiere, se conserva y se pierde de acuerdo con lo establecido por los tratados."
+        ],
+        correcta: 2,
+        explicacion: "El artículo 11.1 CE dice que la nacionalidad se adquiere, conserva y pierde de acuerdo con lo establecido por la ley."
+      },
+      {
+        enunciado: "22. Según el artículo 11 de la Constitución:",
+        opciones: [
+          "Ningún español podrá ser privado de su nacionalidad.",
+          "Ningún español de origen podrá ser privado de su nacionalidad.",
+          "Ningún ciudadano podrá ser privado de su nacionalidad.",
+          "Ninguna es correcta."
+        ],
+        correcta: 1,
+        explicacion: "El artículo 11.2 CE protege específicamente al español de origen."
+      },
+      {
+        enunciado: "23. ¿Quién podrá concertar tratados de doble nacionalidad según la Constitución?",
+        opciones: ["El Gobierno.", "El Estado.", "Los poderes públicos.", "Las Cortes Generales."],
+        correcta: 1,
+        explicacion: "El artículo 11.3 CE dice literalmente que el Estado podrá concertar tratados de doble nacionalidad."
+      },
+      {
+        enunciado: "24. ¿Con qué países se podrá concertar tratados de doble nacionalidad según nuestra Constitución?",
+        opciones: [
+          "Con los países iberoamericanos o con aquellos que hayan tenido o tengan una particular vinculación histórica con España.",
+          "Con los países iberoamericanos o con aquellos que tengan una particular vinculación con la historia de España.",
+          "Con los países iberoamericanos o con aquellos que hayan tenido o tengan una particular vinculación con España, en virtud de ley.",
+          "Con los países iberoamericanos o con aquellos que hayan tenido o tengan una particular vinculación con España."
+        ],
+        correcta: 3,
+        explicacion: "La fórmula literal del artículo 11.3 CE es: países iberoamericanos o aquellos que hayan tenido o tengan una particular vinculación con España."
+      },
+      {
+        enunciado: "25. Según la Constitución española, en los países iberoamericanos ________________________, podrán naturalizarse los españoles sin perder su nacionalidad de origen.",
+        opciones: [
+          "Cuando no reconozcan a sus ciudadanos un derecho recíproco.",
+          "Aun cuando no reconozcan a sus ciudadanos un derecho recíproco.",
+          "Ninguna es correcta.",
+          "La opción a) y b) son correctas."
+        ],
+        correcta: 1,
+        explicacion: "El artículo 11.3 CE dice «aun cuando no reconozcan a sus ciudadanos un derecho recíproco»."
+      },
+      {
+        enunciado: "26. ¿En qué artículo de la Constitución se recoge “Los españoles son mayores de edad a los dieciocho años”?",
+        opciones: ["Artículo 12.", "Artículo 18.", "Artículo 13.", "Artículo 11."],
+        correcta: 0,
+        explicacion: "La mayoría de edad a los dieciocho años aparece en el artículo 12 CE."
+      },
+      {
+        enunciado: "27. ¿Quiénes gozarán en España de las libertades públicas que garantiza el presente Título en los términos que establezcan los tratados y la ley?",
+        opciones: ["Los ciudadanos.", "Los extranjeros.", "Los españoles.", "Los poderes públicos."],
+        correcta: 1,
+        explicacion: "El artículo 13.1 CE se refiere a los extranjeros."
+      },
+      {
+        enunciado: "28. ¿Quiénes serán titulares de los derechos reconocidos en el artículo 23, salvo lo que, atendiendo a criterios de reciprocidad, pueda establecerse por tratado o ley para el derecho de sufragio activo y pasivo en las elecciones municipales?",
+        opciones: ["Los ciudadanos.", "Solamente los extranjeros.", "Solamente los españoles.", "Los poderes públicos."],
+        correcta: 2,
+        explicacion: "El artículo 13.2 CE establece que solo los españoles serán titulares de los derechos del artículo 23, con esa excepción municipal."
+      },
+      {
+        enunciado: "29. Artículo 13 Constitución Española. La extradición solo se concederá en cumplimiento de un tratado o de la ley, atendiendo al:",
+        opciones: ["Principio de solidaridad.", "Principio de territorialidad.", "Principio de reciprocidad.", "Principio de legalidad."],
+        correcta: 2,
+        explicacion: "El artículo 13.3 CE remite al principio de reciprocidad."
+      }
+    ];
+
+    const form = document.getElementById('quizForm');
+    const results = document.getElementById('results');
+    const score = document.getElementById('score');
+    const summary = document.getElementById('summary');
+
+    function renderPreguntas() {
+      form.innerHTML = '';
+      preguntas.forEach((pregunta, i) => {
+        const bloque = document.createElement('section');
+        bloque.className = 'question';
+        bloque.innerHTML = `
+          <h3>${pregunta.enunciado}</h3>
+          <div class="options">
+            ${pregunta.opciones.map((op, j) => `
+              <label class="option">
+                <input type="radio" name="pregunta_${i}" value="${j}">
+                ${String.fromCharCode(97 + j)}) ${op}
+              </label>
+            `).join('')}
+          </div>
+          <div id="feedback_${i}" class="feedback"></div>
+          <div id="explanation_${i}" class="explanation"></div>
+        `;
+        form.appendChild(bloque);
+      });
+    }
+
+    function corregirTest() {
+      let aciertos = 0;
+      let contestadas = 0;
+
+      preguntas.forEach((pregunta, i) => {
+        const seleccionada = document.querySelector(`input[name="pregunta_${i}"]:checked`);
+        const feedback = document.getElementById(`feedback_${i}`);
+        const explanation = document.getElementById(`explanation_${i}`);
+
+        if (seleccionada) {
+          contestadas++;
+          const valor = Number(seleccionada.value);
+          if (valor === pregunta.correcta) {
+            aciertos++;
+            feedback.textContent = '✅ Correcta';
+            feedback.className = 'feedback correct';
+          } else {
+            feedback.textContent = `❌ Incorrecta. Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}`;
+            feedback.className = 'feedback incorrect';
+          }
+          explanation.textContent = pregunta.explicacion;
+        } else {
+          feedback.textContent = '⚠️ No contestada.';
+          feedback.className = 'feedback incorrect';
+          explanation.textContent = `Respuesta correcta: ${String.fromCharCode(97 + pregunta.correcta)}) ${pregunta.opciones[pregunta.correcta]}. ${pregunta.explicacion}`;
+        }
+      });
+
+      const total = preguntas.length;
+      const nota10 = ((aciertos / total) * 10).toFixed(2);
+      score.textContent = `Resultado: ${aciertos}/${total} aciertos · Nota: ${nota10}/10`;
+      summary.innerHTML = `
+        <p><strong>Preguntas contestadas:</strong> ${contestadas} de ${total}</p>
+        <p><strong>Errores o no contestadas:</strong> ${total - aciertos}</p>
+      `;
+      results.classList.remove('hidden');
+      results.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function reiniciarTest() {
+      form.reset();
+      preguntas.forEach((_, i) => {
+        document.getElementById(`feedback_${i}`).textContent = '';
+        document.getElementById(`feedback_${i}`).className = 'feedback';
+        document.getElementById(`explanation_${i}`).textContent = '';
+      });
+      results.classList.add('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    renderPreguntas();
+  </script>
+</body>
+</html>
