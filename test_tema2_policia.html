@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Policía Local de Andalucía - Tema 2</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+      --ok-bg: #ecfdf5;
+      --ok-border: #10b981;
+      --bad-bg: #fef2f2;
+      --bad-border: #ef4444;
+      --note-bg: #eff6ff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: var(--bg); color: var(--text); line-height: 1.45; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+    .hero {
+      background: linear-gradient(135deg, #ffffff 0%, #eef4ff 100%);
+      border: 1px solid var(--border); border-radius: 18px; padding: 22px; margin-bottom: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+    }
+    h1 { margin: 0 0 8px; font-size: 2rem; }
+    .sub { margin: 0; color: var(--muted); }
+    .toolbar {
+      position: sticky; top: 0; z-index: 20; background: rgba(246,248,252,0.92);
+      backdrop-filter: blur(8px); padding: 12px 0; margin-bottom: 18px;
+    }
+    .toolbar-inner {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;
+      background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 12px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    }
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    button { border: 0; border-radius: 10px; padding: 10px 14px; font-size: 0.96rem; cursor: pointer; }
+    .primary { background: var(--accent); color: #fff; font-weight: 700; }
+    .secondary { background: #e5e7eb; color: #111827; font-weight: 700; }
+    .status { font-weight: 700; color: var(--muted); }
+    .question {
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px;
+      margin-bottom: 14px; box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    }
+    .question h3 { margin: 0 0 12px; font-size: 1.06rem; }
+    .opt {
+      display: block; padding: 10px 12px; margin: 8px 0; border: 1px solid var(--border);
+      border-radius: 12px; cursor: pointer; transition: 0.15s ease; background: #fff;
+    }
+    .opt:hover { border-color: var(--accent); background: #f8fbff; }
+    .opt input { margin-right: 10px; transform: scale(1.1); }
+    .result { margin-top: 12px; padding: 12px; border-radius: 12px; display: none; border: 1px solid var(--border); }
+    .correct { background: var(--ok-bg); border-color: var(--ok-border); }
+    .incorrect { background: var(--bad-bg); border-color: var(--bad-border); }
+    .summary {
+      display: none; margin-top: 22px; background: var(--note-bg); border: 1px solid #93c5fd;
+      border-radius: 16px; padding: 18px; box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+    }
+    .summary h2 { margin-top: 0; }
+    .muted { color: var(--muted); font-size: 0.95rem; }
+    .pill {
+      display: inline-block; padding: 4px 10px; background: #dbeafe; border-radius: 999px;
+      font-weight: 700; margin-top: 8px;
+    }
+    @media (max-width: 700px) {
+      h1 { font-size: 1.6rem; }
+      .toolbar-inner { align-items: stretch; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Test Policía Local de Andalucía - Tema 2</h1>
+      <p class="sub">Cuestionario en HTML listo para GitHub Pages. Marca tus respuestas y pulsa <strong>Corregir test</strong> para ver la puntuación y las soluciones.</p>
+      <div class="pill">31 preguntas</div>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <div class="btns">
+          <button class="primary" onclick="gradeQuiz()">Corregir test</button>
+          <button class="secondary" onclick="resetQuiz()">Reiniciar</button>
+        </div>
+        <div class="status" id="status">Pendiente de corregir</div>
+      </div>
+    </div>
+
+    <div id="quiz"></div>
+
+    <section class="summary" id="summary">
+      <h2>Resultado final</h2>
+      <p id="scoreLine"></p>
+      <p class="muted">El test respeta el PDF. En la pregunta 14 se admiten <strong>b</strong> y <strong>c</strong> porque en el documento ambas aparecen con el mismo contenido esencial.</p>
+    </section>
+  </div>
+
+  <script>
+    const questions = [{"n": 1, "q": "¿De qué año es la Declaración de Derechos del Buen Pueblo de Virginia?", "options": {"a": "Año 1776", "b": "Año 1789", "c": "Año 1948", "d": "Año 1667"}, "answer": ["a"]}, {"n": 2, "q": "¿Qué normativa regula la cláusula de conciencia de los profesionales de la información?", "options": {"a": "L.O 7/21, 26 mayo", "b": "L.O 3/18, 5 diciembre", "c": "Ley 2/97, 19 junio", "d": "L.O 2/97, 19 junio"}, "answer": ["d"]}, {"n": 3, "q": "¿Cuál de las siguientes declaraciones es de 10 de diciembre de 1948?", "options": {"a": "Declaración de Derechos del Buen Pueblo de Virginia", "b": "Declaración de Independencia", "c": "Declaración de Derechos del Hombre y del Ciudadano", "d": "Declaración Universal de Derechos Humanos"}, "answer": ["d"]}, {"n": 4, "q": "¿Cuál es el enunciado del  Título I, Capítulo 2 , Sección 1 de la CE ?", "options": {"a": "De los derechos universales y libertades públicas", "b": "De los deberes fundamentales y libertades públicas", "c": "De los derechos fundamentales y libertades públicas", "d": "De los derechos y deberes fundamentales"}, "answer": ["c"]}, {"n": 5, "q": "¿Qué prohíbe expresamente el Artículo 15 en relación con la vida y la integridad física y moral?", "options": {"a": "Las torturas", "b": "las penas o tratos degradantes", "c": "a y b son correctas", "d": "El artículo 15 no recoge el derecho a la vida"}, "answer": ["c"]}, {"n": 6, "q": "¿Qué establece la L.O. 11/1995, de 27 de noviembre, en relación con la pena de muerte?", "options": {"a": "La pena de muerte está permitida en tiempos de guerra.", "b": "La pena de muerte está abolida en todos los casos.", "c": "La pena de muerte está abolida en tiempos de guerra.", "d": "La pena de muerte es necesario en tiempos de guerra."}, "answer": ["c"]}, {"n": 7, "q": "¿Qué garantiza el Artículo 16 en relación con la libertad ideológica, religiosa y de culto?", "options": {"a": "Garantiza la libertad sin limitaciones.", "b": "Garantiza la libertad con limitaciones .", "c": "Garantiza la libertad solo para las comunidades.", "d": "Garantiza la libertad solo para el individuo"}, "answer": ["b"]}, {"n": 8, "q": "A tenor literal del artículo 16.2 de la C.E:", "options": {"a": "Algunos podrán ser obligado a declarar sobre su ideología, religión o creencias.", "b": "Nadie podrá ser obligado a declarar sobre su ideología, religión o creencias. .", "c": "Nadie podrá ser obligado a declarar sobre su ideología, confesión o creencias. .", "d": "Nadie podrá ser obligado a manifestar sobre su ideología, religión o creencias."}, "answer": ["b"]}, {"n": 9, "q": "¿Qué regula la Ley Orgánica 7/1980, de 5 de julio?", "options": {"a": "La libertad de cátedra.", "b": "La Libertad Religiosa.", "c": "La detención preventiva.", "d": "El derecho de reunión"}, "answer": ["b"]}, {"n": 10, "q": "¿Qué ley aprueba el Acuerdo de Cooperación del Estado con la Federación de Entidades Religiosas Evangélicas de España?", "options": {"a": "Ley 24/1992, 10 noviembre", "b": "Ley 25/1992, 10 noviembre", "c": "Ley 26/1992, 10 noviembre", "d": "Ley 25/1992, 1 noviembre"}, "answer": ["a"]}, {"n": 11, "q": "¿Qué Acuerdo de Cooperación del Estado  aprueba la Ley 25/1992, de 10 de noviembre?", "options": {"a": "Con la Federación de Entidades Religiosas Evangélicas de España.", "b": "Con la Federación de Comunidades Israelitas en España", "c": "b) Con la Federación de Comunidades Islámicas en España", "d": "Ninguna es correcta."}, "answer": ["b"]}, {"n": 12, "q": "¿Cuál es el derecho fundamental establecido en el Artículo 17 CE?", "options": {"a": "Derecho a la intimidad.", "b": "Derecho a la libertad y seguridad", "c": "Derecho a la propiedad privada.", "d": "Derecho al honor."}, "answer": ["b"]}, {"n": 13, "q": "¿Cuál es el plazo máximo para la detención preventiva según 17.2 CE?", "options": {"a": "24 horas.", "b": "48 horas.", "c": "72 horas.", "d": "El tiempo estrictamente necesario y nunca más de 72 horas."}, "answer": ["d"]}, {"n": 14, "q": "Toda persona detenida según el artículo 17.3 CE:", "options": {"a": "Debe ser informada de forma inmediata, indiferentemente del modo en que se transmita , de sus derechos y de las razones de su detención, no pudiendo ser obligada a declarar.", "b": "debe ser informada de forma inmediata, y de modo que le sea comprensible, de sus derechos y de las razones de su detención, no pudiendo ser obligada a declarar.", "c": "debe ser informada de forma inmediata, y de modo que le sea comprensible, de sus derechos y de las razones de su detención, no pudiendo ser obligada a declarar", "d": "debe ser informada de forma inmediata, y de modo que le sea comprensible, de sus derechos y de las razones de su detención, pudiendo ser obligada a declarar"}, "answer": ["b", "c"]}, {"n": 15, "q": "Según el artículo 17.4 C.E. ¿Cómo se llama el procedimiento que regula la ley para producir la inmediata puesta a disposición judicial de toda persona detenida ilegalmente?", "options": {"a": "Procedimiento penal corpus", "b": "Procedimiento de habeas corpus.", "c": "Procedimiento corpus christi.", "d": "Procedimiento de habemus corpus."}, "answer": ["b"]}, {"n": 16, "q": "¿Cuál es el objeto de la Ley 4/1997, de 4 de agosto?", "options": {"a": "La protección de la seguridad ciudadana.", "b": "Regulación de utilización de videocámaras por las Fuerzas y Cuerpos de Seguridad en lugares públicos.", "c": "La asistencia letrada al detenido o preso.", "d": "La asistencia jurídica gratuita"}, "answer": ["b"]}, {"n": 17, "q": "¿Qué ley regula la asistencia letrada al detenido o preso?", "options": {"a": "Ley 4/1997", "b": "L.O 6/1984", "c": "L.O 14/1983", "d": "Ley 1/1996"}, "answer": ["c"]}, {"n": 18, "q": "Según el artículo 20 de la C.E , ¿Cuál es el único motivo por el cual se puede acordar el secuestro de publicaciones?", "options": {"a": "Resolución judicial", "b": "Orden gubernamental", "c": "Denuncia ciudadana", "d": "Decisión policial"}, "answer": ["a"]}, {"n": 19, "q": "¿Cuáles son los derechos garantizados por el Artículo 18.1 C.E?", "options": {"a": "Únicamente el derecho al honor, a la intimidad", "b": "El derecho al honor, a la intimidad personal y familiar y a la propia imagen.", "c": "el derecho al honor, a la intimidad personal y familiar y a la inviolabilidad de domicilio.", "d": "el derecho a la información, expresión y difusión."}, "answer": ["b"]}, {"n": 20, "q": "¿Bajo qué circunstancias se permite la entrada o registro en el domicilio según el artículo 18.2 C.E?", "options": {"a": "Consentimiento del titular.", "b": "Resolución judicial.", "c": "En caso de flagrancia", "d": "Todas son correctas"}, "answer": ["d"]}, {"n": 21, "q": "¿Qué garantiza el artículo 18.3 C.E en relación con las comunicaciones?", "options": {"a": "El secreto.", "b": "La intervención sin restricciones.", "c": "El acceso libre a las postales.", "d": "La libre difusión."}, "answer": ["a"]}, {"n": 22, "q": "¿Cuál es el propósito de la ley en relación con el uso de la informática según el artículo 18.4 C.E ?", "options": {"a": "Limitarla para garantizar el honor y la intimidad personal y familiar de los ciudadanos y el pleno ejercicio de sus derechos.", "b": "Garantizar el pleno ejercicio de los derechos digitales.", "c": "Permitir que cualquier ciudadano pueda acceder sin restricciones.", "d": "Limitarla para garantizar el honor y la intimidad personal y familiar de los ciudadanos y el pleno ejercicio de sus obligaciones."}, "answer": ["a"]}, {"n": 23, "q": "¿Cuál de las normativas mencionadas está relacionada con la protección civil del derecho al honor, a la intimidad y a la propia imagen?", "options": {"a": "L.O 1/1982", "b": "L.O 10/95", "c": "L.O. 3/2018", "d": "L.O. 7/2021"}, "answer": ["a"]}, {"n": 24, "q": "¿Cuál de los siguientes no es uno de los derechos reconocido y protegido por el Artículo 20 de C.E?", "options": {"a": "Derecho a la producción literaria", "b": "Derecho a expresar libremente ideas", "c": "Derecho al trabajo", "d": "Derecho a la libertad de cátedra"}, "answer": ["c"]}, {"n": 25, "q": "¿Qué derechos tienen los españoles según el Artículo 19 C.E?", "options": {"a": "Derecho a circular por el territorio nacional.", "b": "Derecho a la entrada y salida libre de España.", "c": "Derecho a elegir libremente su residencia.", "d": "Todas las anteriores."}, "answer": ["d"]}, {"n": 26, "q": "Cuál es la normativa que regula la entrada, libre circulación y residencia en España de ciudadanos de los Estados miembros de la Unión Europea y de otros Estados parte en el Acuerdo sobre el Espacio Económico Europeo.", "options": {"a": "R.D 240/2007, 16 febrero", "b": "L.O. 1/1982, 5 mayo", "c": "L.O. 3/2018, 5 diciembre", "d": "Ley 22/1995, 17 julio"}, "answer": ["a"]}, {"n": 27, "q": "¿Qué normativa abolió la pena de muerte en tiempos de guerra en España?", "options": {"a": "L.O. 11/1995, 27 noviembre", "b": "L.O. 14/2015, 17 noviembre", "c": "Declaración Universal de Derechos Humanos", "d": "Declaración de independencia"}, "answer": ["a"]}, {"n": 28, "q": "En nuestra C.E de 1978, ¿dónde viene establecido específicamente que se garantiza la libertad ideológica, religiosa y de culto?", "options": {"a": "Artículo 16.2", "b": "Artículo 15.2", "c": "Artículo 17.1", "d": "Artículo 16.1"}, "answer": ["d"]}, {"n": 29, "q": "Según el Artículo 18 de la C.E, se garantiza el secreto de las comunicaciones y, en especial ¿", "options": {"a": "las postales, telegráficas y radiofónicas, salvo resolución gubernamental", "b": "las postales, telegráficas y telefónicas, salvo resolución judicial", "c": "las postales, telegráficas y radiofónicas, salvo resolución judicial", "d": "las postales, telegráficas y telefónicas, salvo resolución administrativa"}, "answer": ["b"]}, {"n": 30, "q": "¿Qué artículo de la C.E reconoce y protege el derecho a la producción y creación literaria, artística, científica y técnica.?", "options": {"a": "Artículo 19.1a", "b": "Artículo 20.1b", "c": "Artículo 20.1d", "d": "Artículo 19.1c"}, "answer": ["b"]}, {"n": 31, "q": "Según el artículo 16 de la C.E, ¿qué confesión tendrá carácter estatal?", "options": {"a": "Confesión Católica", "b": "Iglesia Católica", "c": "Todas las reconocidas.", "d": "Ninguna"}, "answer": ["d"]}];
+
+    function renderQuiz() {
+      const quiz = document.getElementById("quiz");
+      quiz.innerHTML = questions.map(q => {
+        const optionsHtml = Object.entries(q.options).map(([key, value]) => `
+          <label class="opt">
+            <input type="radio" name="q${q.n}" value="${key}">
+            <strong>${key})</strong> ${value}
+          </label>
+        `).join("");
+        return `
+          <article class="question" id="question-${q.n}">
+            <h3>${q.n}. ${q.q}</h3>
+            <div>${optionsHtml}</div>
+            <div class="result" id="result-${q.n}"></div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function gradeQuiz() {
+      let correct = 0;
+      let answered = 0;
+
+      questions.forEach(q => {
+        const selected = document.querySelector(`input[name="q${q.n}"]:checked`);
+        const resultBox = document.getElementById(`result-${q.n}`);
+        const validAnswers = q.answer;
+        const correctText = validAnswers.map(a => `<strong>${a})</strong> ${q.options[a]}`).join("<br>");
+
+        resultBox.style.display = "block";
+
+        if (selected) answered += 1;
+
+        if (selected && validAnswers.includes(selected.value)) {
+          correct += 1;
+          resultBox.className = "result correct";
+          resultBox.innerHTML = `✅ <strong>Correcta</strong><br>Solución: ${correctText}`;
+        } else {
+          resultBox.className = "result incorrect";
+          if (selected) {
+            resultBox.innerHTML = `❌ <strong>Incorrecta</strong><br>Tu respuesta: <strong>${selected.value})</strong> ${q.options[selected.value]}<br>Solución: ${correctText}`;
+          } else {
+            resultBox.innerHTML = `❌ <strong>Sin responder</strong><br>Solución: ${correctText}`;
+          }
+        }
+      });
+
+      const summary = document.getElementById("summary");
+      const scoreLine = document.getElementById("scoreLine");
+      const status = document.getElementById("status");
+      const percent = ((correct / questions.length) * 100).toFixed(2);
+
+      summary.style.display = "block";
+      scoreLine.innerHTML = `<strong>Aciertos:</strong> ${correct} / ${questions.length}<br><strong>Respondidas:</strong> ${answered} / ${questions.length}<br><strong>Porcentaje:</strong> ${percent}%`;
+      status.textContent = `Corregido: ${correct} / ${questions.length} (${percent}%)`;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function resetQuiz() {
+      document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+      document.querySelectorAll('.result').forEach(box => {
+        box.style.display = 'none';
+        box.className = 'result';
+        box.innerHTML = '';
+      });
+      document.getElementById("summary").style.display = "none";
+      document.getElementById("status").textContent = "Pendiente de corregir";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    renderQuiz();
+  </script>
+</body>
+</html>
